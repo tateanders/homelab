@@ -11,3 +11,6 @@
 - Copied key to macbook for password-free ssh, then disabled pasword and root login via /etc/ssh/sshd_config.d/hardening.conf
 - Verified that password login is refused using ssh -o PubkeyAuthentication=no user@ip
 - Enabled Uncomplicated Firewall (UFW) allowing only SSH
+- Reserved xxx.xxx.xx.243 in Google Home app
+- Masked all sleep and suspend targets so the pc can't go to sleep
+- Verified networking and SSH come up on their own by rebooting and sshing in via macbook
