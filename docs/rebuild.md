@@ -50,9 +50,48 @@ git clone git@github.com:<github-user>/homelab.git /srv/homelab
 - It survives a reinstall, so nothing to redo unless the Wi-Fi card changes
 
 ## 8. Verify
-sudo reboot, then SSH in from the Mac without touching the PC
+- first, run
+   ```bash
+   sudo reboot
+   ```
+- then SSH in from the Mac without touching the PC
+
+
+## 9. Install Docker
+- Run the install docker script
+   ```bash
+   sudo /srv/homelab/scripts/install-docker.sh
+   ```
+
+## 10. Make Docker respect UFW
+- Run the docker UFW script
+   ```bash
+   sudo /srv/homelab/scripts/docker-ufw.sh
+   ```
+- LAN block test. Start a test container on TateDeb:
+   ```bash
+   sudo docker run -d --rm --name ufwtest -p 8080:80 nginx:alpine
+   ```
+   From another device on the LAN (should time out):
+   ```bash
+   curl -m 5 http://192.168.86.243:8080
+   ```
+   Back on TateDeb, check that the drop was logged, then stop the container:
+   ```bash
+   sudo journalctl -k --since "5 min ago" | grep "UFW DOCKER BLOCK"
+   sudo docker stop ufwtest
+   ```
+- Container internet test (should print the Example Domain HTML):
+   ```bash
+   sudo docker run --rm alpine wget -qO- -T 5 https://example.com
+   ```
+- Reboot, then check that the DOCKER-USER chain still has the rules and "1 references":
+   ```bash
+   sudo iptables -L DOCKER-USER -n -v
+   ```
+###Notes
+- To expose a container: `sudo ufw route allow proto tcp from <source> to any port <container port>`. Use the container's internal port, not the published one.
+- If ufw-docker ever needs an update, download it, review it again, then replace the copy in `scripts/vendor/`.
 
 ## To do
-- Docker and Compose (official repo)
-- Fix Docker's UFW bypass
 - Tailscale
