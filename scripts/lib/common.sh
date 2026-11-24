@@ -33,3 +33,8 @@ require_docker() {
   command -v docker >/dev/null || die "Docker not installed"
   systemctl is-active --quiet docker || die "Docker not running"
 }
+
+require_tailscale() {
+  command -v tailscale >/dev/null || die "Tailscale not installed"
+  systemctl is-active --quiet tailscaled || die "tailscaled not running"
+}
