@@ -9,3 +9,6 @@ secrets/
 data/
 appdata/
 volumes/
+
+# macOS
+.DS_Store

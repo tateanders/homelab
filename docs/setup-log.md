@@ -18,7 +18,7 @@ What I did, in order, and why I made the choices I made. Steps to redo it are in
 - Created an ed25519 key for GitHub, cloned this repo to `/srv/homelab`
 - Copied key to MacBook for password-free SSH, then disabled password and root login via `/etc/ssh/sshd_config.d/hardening.conf`
 - Enabled Uncomplicated Firewall (UFW) allowing only SSH
-- Reserved `xxx.xxx.xx.243` in Google Home app
+- Reserved `192.168.86.243` in Google Home app
 - Masked all sleep and suspend targets so the PC can't go to sleep
 
 ### Testing
@@ -118,7 +118,7 @@ What I did, in order, and why I made the choices I made. Steps to redo it are in
 - Repo file: `/etc/apt/sources.list.d/tailscale.list`
 - Version: 1.104.7
 - tailscaled is enabled at boot
-- Logged in with `sudo tailscale up`. TateDeb's Tailscale address is 100.76.29.56.
+- Logged in with `sudo tailscale up`. TateDeb's Tailscale address is 100.xx.xx.xx.
 - Disabled key expiry for TateDeb in the admin console
 - Installed Tailscale on my Mac and logged in to the same account
 
@@ -138,13 +138,13 @@ What I did, in order, and why I made the choices I made. Steps to redo it are in
 - Free Personal plan, which is for non-commercial use
 
 ### Testing
-- SSH from my Mac to 100.76.29.56 worked
+- SSH from my Mac to 100.xx.xx.xx worked
 - SSH worked with the Mac on a phone hotspot, but it was really laggy. Probably relayed because of the carrier's network.
 - After the fix, the port 9999 test timed out and a new SSH connection over Tailscale still worked
 - Re-ran `tailscale-ufw.sh` and it skipped the existing rules and passed its checks
 - Rebooted and TateDeb rejoined on its own. SSH over Tailscale worked and `sudo iptables -L ts-input -n` still showed no chain.
-- Ran a test nginx container on 8080 and curled 100.76.29.56:8080 from my Mac. It timed out.
+- Ran a test nginx container on 8080 and curled 100.xx.xx.xx:8080 from my Mac. It timed out.
 
 ### Notes for later
-- Run `tailscale ping 100.76.29.56` from my Mac when I'm actually away from home to see if the connection is direct or relayed
+- Run `tailscale ping 100.xx.xx.xx` from my Mac when I'm actually away from home to see if the connection is direct or relayed
 - Nothing is reachable over Tailscale without a UFW rule now. Services need `ufw allow in on tailscale0 to any port <port> proto tcp`, and containers need `ufw route allow proto tcp from 100.64.0.0/10 to any port <container port>`.
