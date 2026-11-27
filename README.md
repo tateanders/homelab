@@ -8,7 +8,7 @@ I wanted hands-on practice setting up and hardening a Linux server myself. The e
 
 ## Hardware
 
-- It's running on my gaming PC (which I unfortunately don't have time to use), running a seperate M.2 drive for debian that I switch to in the BIOS so I can have a more native Linux experience rather than just dual booting.
+- It's running on my gaming PC (which I unfortunately don't have time to use), Debian has its own M.2 drive and I switch drives with BIOS profiles, so the two installs never share a drive or bootloader.
 - Windows runs on my other SATA drive.
 - Everything is managed over SSH from my laptop so there is no desktop environment.
 
@@ -30,7 +30,8 @@ I wanted hands-on practice setting up and hardening a Linux server myself. The e
 Docker writes its own firewall rules, so any container port I published was open to my whole LAN even though UFW was set to deny. I fixed it with ufw-docker and limited it to only trust Docker's own subnets (172.16.0.0/12). To test it I ran an nginx container, confirmed curl from my laptop timed out, and saw the drops show up in the kernel log.
 
 ### Tailscale skipping the firewall
-After setting up Tailscale I ran a throwaway web server on a port UFW should block, and it still loaded from my latop. Because of this I turned off Tailscale's firewall management and allowed only SSH and Tailscale's own UDP port in UFW. After that the port test timed out and containers were blocked over Tailscale.
+After setting up Tailscale I ran a throwaway web server on a port UFW should block, and it still loaded from my latop. Tailscale adds its own iptables chain with a rule that accepts everything on the tailscale0 interface before UFW sees it. Because of this I turned off Tailscale's firewall management and allowed only SSH and Tailscale's own UDP port in UFW. After that the port test timed out and containers were blocked over Tailscale.
+
 
 ### GRUB rescue after switching BIOS profiles
 Switching BIOS profiles kept dropping me into grub rescue. I traced it to Kali's old bootloader sitting in the EFI fallback path from a previous install (same date and the file size as Kali's GRUB). I removed it, put Debian's bootloader in the fallback slot, and set GRUB updates to keep that copy current.
@@ -38,7 +39,7 @@ Switching BIOS profiles kept dropping me into grub rescue. I traced it to Kali's
 ## Hardening
 
 - SSH is key-only, with password and root login turned off
-- UFW denies everything by default, only SSH is allowed in (LAN and Tailscale).
+- UFW denies everything by default, only SSH is allowed (plus Tailscale's UDP port).
 - Unattended upgrades for security patches.
 - ufw-docker installs from a copy saved in this repo instead of downloading it fresh, so a rebuild uses the exact version I reviewed.
 - Sleep is disabled so the server stays up.
@@ -66,4 +67,8 @@ scripts/
 
 ## Hypothetical Roadmap
 
-Immich for photo backups, restic or Borg for backing up the server itself, and Caddy as a reverse proxy.
+- Immich for photo backups
+- Restic or Borg for backing up the server
+- Hugging face LLM
+- Claude code
+- Caddy reverse proxy.
